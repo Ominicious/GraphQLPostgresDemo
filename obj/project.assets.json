@@ -4857,11 +4857,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\My Laboratory\\GraphQL\\GraphQLPostgresDemo\\GraphQLPostgresDemo\\GraphQLPostgresDemo.csproj",
+      "projectUniqueName": "D:\\My Laboratory\\Git Repository\\GraphQLPostgresDemo\\GraphQLPostgresDemo.csproj",
       "projectName": "GraphQLPostgresDemo",
-      "projectPath": "D:\\My Laboratory\\GraphQL\\GraphQLPostgresDemo\\GraphQLPostgresDemo\\GraphQLPostgresDemo.csproj",
+      "projectPath": "D:\\My Laboratory\\Git Repository\\GraphQLPostgresDemo\\GraphQLPostgresDemo.csproj",
       "packagesPath": "C:\\Users\\Omendra Singh\\.nuget\\packages\\",
-      "outputPath": "D:\\My Laboratory\\GraphQL\\GraphQLPostgresDemo\\GraphQLPostgresDemo\\obj\\",
+      "outputPath": "D:\\My Laboratory\\Git Repository\\GraphQLPostgresDemo\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Omendra Singh\\AppData\\Roaming\\NuGet\\NuGet.Config"

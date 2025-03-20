@@ -1,5 +1,6 @@
 using GraphQLPostgresDemo.Data;
 using GraphQLPostgresDemo.GraphQL;
+using GraphQLPostgresDemo.Models;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +11,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Add GraphQL services
 builder.Services
     .AddGraphQLServer()
-    .AddQueryType<Query>();
+    .AddQueryType<Query>()
+    .AddType<Book>()
+    .AddType<Magazine>()
+    .AddInterfaceType<IReadingMaterials>();
 
 var app = builder.Build();
 

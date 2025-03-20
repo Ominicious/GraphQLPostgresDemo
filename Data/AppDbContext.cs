@@ -16,5 +16,19 @@ public class AppDbContext : DbContext
             .HasMany(a => a.Balances)
             .WithOne(b => b.Account)
             .HasForeignKey(b => b.AccountId);
+
+        modelBuilder.Entity<Book>()
+                .Property(b => b.Genre)
+                .HasConversion<string>();
+
+        modelBuilder.Entity<Magazine>()
+                .Property(b => b.Genre)
+                .HasConversion<string>();
+
+        base.OnModelCreating(modelBuilder);
     }
+
+    public DbSet<Book> Books { get; set; }
+
+    public DbSet<Magazine> Magazines { get; set; }
 }
