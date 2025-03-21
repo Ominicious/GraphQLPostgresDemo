@@ -14,7 +14,8 @@ builder.Services
     .AddQueryType<Query>()
     .AddType<Book>()
     .AddType<Magazine>()
-    .AddInterfaceType<IReadingMaterials>();
+    .AddInterfaceType<IReadingMaterials>()
+    .AddMutationType<Mutation>();
 
 var app = builder.Build();
 

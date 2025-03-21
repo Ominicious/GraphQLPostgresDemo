@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GraphQLPostgresDemo")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+565dde5a0aace890db459de17ae708f0881e31a6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+09481a9a551e56c04f7af472906d0706b38b5a90")]
 [assembly: System.Reflection.AssemblyProductAttribute("GraphQLPostgresDemo")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GraphQLPostgresDemo")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
