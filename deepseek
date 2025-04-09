@@ -1,0 +1,141 @@
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Azure;
+using Azure.AI.OpenAI;
+using Newtonsoft.Json.Linq;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        var config = new {
+            AzureOpenAIEndpoint = "YOUR_AZURE_OPENAI_ENDPOINT",
+            AzureOpenAIKey = "YOUR_AZURE_OPENAI_KEY",
+            GraphQLEndpoint = "YOUR_GRAPHQL_ENDPOINT"
+        };
+
+        // Fetch GraphQL Schema
+        var schemaFetcher = new GraphQLSchemaFetcher(config.GraphQLEndpoint);
+        string schema = await schemaFetcher.GetSchemaViaIntrospectionAsync();
+
+        // Initialize Azure OpenAI Client
+        var openAIClient = new OpenAIClient(
+            new Uri(config.AzureOpenAIEndpoint),
+            new AzureKeyCredential(config.AzureOpenAIKey));
+
+        // Chat Loop
+        while (true)
+        {
+            Console.Write("\nEnter your request (or 'exit'): ");
+            var userPrompt = Console.ReadLine();
+            
+            if (userPrompt?.ToLower() == "exit") break;
+
+            try
+            {
+                // Generate GraphQL Query
+                var generatedQuery = await GenerateGraphQLQueryAsync(openAIClient, schema, userPrompt);
+                Console.WriteLine($"\nGenerated Query:\n{generatedQuery}");
+
+                // Execute Query
+                var result = await schemaFetcher.ExecuteQueryAsync(generatedQuery);
+                Console.WriteLine($"\nResult:\n{JToken.Parse(result).ToString(Newtonsoft.Json.Formatting.Indented)}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+        }
+    }
+
+    static async Task<string> GenerateGraphQLQueryAsync(OpenAIClient client, string schema, string userPrompt)
+    {
+        var prompt = $@"
+        Given this GraphQL schema:
+        {schema}
+
+        Generate a query that: {userPrompt}
+        
+        Respond ONLY with the valid GraphQL query between ```graphql and ``` delimiters.
+        Example response:
+        ```graphql
+        query {{ ... }}
+        ```
+        ";
+
+        var chatOptions = new ChatCompletionsOptions()
+        {
+            Messages =
+            {
+                new ChatMessage(ChatRole.System, "You are a GraphQL expert assistant that generates queries."),
+                new ChatMessage(ChatRole.User, prompt)
+            },
+            MaxTokens = 1000,
+            Temperature = 0.2f
+        };
+
+        var response = await client.GetChatCompletionsAsync("gpt-4", chatOptions); // Use your deployment name
+        var rawResponse = response.Value.Choices[0].Message.Content;
+
+        // Extract code between ```graphql and ```
+        var start = rawResponse.IndexOf("```graphql") + 10;
+        var end = rawResponse.IndexOf("```", start);
+        return rawResponse.Substring(start, end - start).Trim();
+    }
+}
+
+class GraphQLSchemaFetcher
+{
+    private readonly HttpClient _client;
+    private readonly string _endpoint;
+
+    public GraphQLSchemaFetcher(string endpoint)
+    {
+        _client = new HttpClient();
+        _endpoint = endpoint;
+    }
+
+    public async Task<string> GetSchemaViaIntrospectionAsync()
+    {
+        var introspectionQuery = @"
+        {
+            __schema {
+                types {
+                    name
+                    kind
+                    fields {
+                        name
+                        type {
+                            name
+                            kind
+                            ofType {
+                                name
+                                kind
+                            }
+                        }
+                    }
+                }
+            }
+        }";
+
+        var response = await ExecuteQueryAsync(introspectionQuery);
+        return JObject.Parse(response)["data"].ToString();
+    }
+
+    public async Task<string> ExecuteQueryAsync(string query)
+    {
+        var request = new
+        {
+            query = query.Replace("\n", " ").Replace("\r", "").Replace("  ", " ")
+        };
+
+        var content = new StringContent(
+            Newtonsoft.Json.JsonConvert.SerializeObject(request),
+            System.Text.Encoding.UTF8,
+            "application/json");
+
+        var response = await _client.PostAsync(_endpoint, content);
+        return await response.Content.ReadAsStringAsync();
+    }
+}
